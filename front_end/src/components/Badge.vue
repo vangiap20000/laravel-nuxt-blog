@@ -1,19 +1,16 @@
 <template>
-	<div class="px-3 h-6 rounded-full text-xs font-semibold flex items-center"
-		:class="`bg-${color}-200`">
+	<UBadge :ui="{ rounded: 'rounded-full' }" :color="color" variant="subtle">
 		<span class="w-2 h-2 rounded-full mr-1" :class="`bg-${color}-500 bg-${color}-600`"></span>
-		<span :class="`text-${color}-800`">
+		<span>
 			<slot></slot>
 		</span>
-	</div>
+	</UBadge>
 </template>
-<script>
-export default {
-	props: {
-		color: {
-			type: String,
-			default: "teal"
-		}
+<script setup lang="ts">
+const props = defineProps({
+	color: {
+		type: String,
+		default: "teal"
 	}
-};
+})
 </script>

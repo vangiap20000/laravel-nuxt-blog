@@ -19,11 +19,11 @@
 						</button>
 					</div>
 					<!-- Draggable component comes from vuedraggable. It provides drag & drop functionality -->
-					<draggable :list="column.tasks" :animation="200" ghost-class="ghost-card" group="tasks">
+					<VueDraggableNext :list="column.tasks" :animation="200" ghost-class="ghost-card" group="tasks">
 						<!-- Each element from here will be draggable and animated. Note :key is very important here to be unique both for draggable and animations to be smooth & consistent. -->
 						<task-card v-for="(task) in column.tasks" :key="task.id" :task="task" class="mt-3 cursor-move"></task-card>
 						<!-- </transition-group> -->
-					</draggable>
+					</VueDraggableNext>
 				</div>
 			</div>
 		</div>
@@ -63,157 +63,167 @@
 				</UForm>
 			</UCard>
 		</UModal>
+		<UBadge :color="color" :ui="{ rounded: 'rounded-full' }">Badge</UBadge>
 	</div>
 </template>
 
-<script>
+<script setup lang="ts">
 import { VueDraggableNext } from 'vue-draggable-next'
 import { RegisterValidationSchema } from '../schemas/AddEditTask'
 
-export default {
-	name: "App",
-	components: {
-		draggable: VueDraggableNext,
-	},
-	data() {
-		return {
-			columns: [
-				{
-					title: "Backlog",
-					tasks: [
-						{
-							id: 1,
-							title: "Add discount code to checkout page",
-							date: "Sep 14",
-							type: 1
-						},
-						{
-							id: 2,
-							title: "Provide documentation on integrations",
-							date: "Sep 12"
-						},
-						{
-							id: 3,
-							title: "Design shopping cart dropdown",
-							date: "Sep 9",
-							type: 2
-						},
-						{
-							id: 4,
-							title: "Add discount code to checkout page",
-							date: "Sep 14",
-							type: 1
-						},
-						{
-							id: 5,
-							title: "Test checkout flow",
-							date: "Sep 15",
-							type: 3
-						}
-					]
-				},
-				{
-					title: "In Progress",
-					tasks: [
-						{
-							id: 6,
-							title: "Design shopping cart dropdown",
-							date: "Sep 9",
-							type: 2
-						},
-						{
-							id: 7,
-							title: "Add discount code to checkout page",
-							date: "Sep 14",
-							type: 1
-						},
-						{
-							id: 8,
-							title: "Provide documentation on integrations",
-							date: "Sep 12",
-							type: 4
-						}
-					]
-				},
-				{
-					title: "Review",
-					tasks: [
-						{
-							id: 9,
-							title: "Provide documentation on integrations",
-							date: "Sep 12"
-						},
-						{
-							id: 10,
-							title: "Design shopping cart dropdown",
-							date: "Sep 9",
-							type: 2
-						},
-						{
-							id: 11,
-							title: "Add discount code to checkout page",
-							date: "Sep 14",
-							type: 1
-						},
-						{
-							id: 12,
-							title: "Design shopping cart dropdown",
-							date: "Sep 9",
-							type: 2
-						},
-						{
-							id: 13,
-							title: "Add discount code to checkout page",
-							date: "Sep 14",
-							type: 1
-						}
-					]
-				},
-				{
-					title: "Done",
-					tasks: [
-						{
-							id: 14,
-							title: "Add discount code to checkout page",
-							date: "Sep 14",
-							type: 1
-						},
-						{
-							id: 15,
-							title: "Design shopping cart dropdown",
-							date: "Sep 9",
-							type: 2
-						},
-						{
-							id: 16,
-							title: "Add discount code to checkout page",
-							date: "Sep 14",
-							type: 1
-						}
-					]
-				}
-			],
-			isOpen: false,
-			formState: {
-				title: null,
-				type: null,
-				status: null,
-				content: null
+let isOpen = ref(false)
+
+const formState = reactive({
+	title: undefined,
+	type: undefined,
+	status: undefined,
+	content: undefined
+})
+
+const openModal = (statusValue) => {
+	isOpen.value = true;
+	formState.status = statusValue;
+	formState.title = undefined;
+	formState.type = undefined;
+	formState.content = undefined;
+}
+
+const closeModal = () => {
+	isOpen.value = false;
+}
+
+const columns = [
+	{
+		title: "Backlog",
+		tasks: [
+			{
+				id: 1,
+				title: "Add discount code to checkout page",
+				date: "Sep 14",
+				type: 1
+			},
+			{
+				id: 2,
+				title: "Provide documentation on integrations",
+				date: "Sep 12"
+			},
+			{
+				id: 3,
+				title: "Design shopping cart dropdown",
+				date: "Sep 9",
+				type: 2
+			},
+			{
+				id: 4,
+				title: "Add discount code to checkout page",
+				date: "Sep 14",
+				type: 1
+			},
+			{
+				id: 5,
+				title: "Test checkout flow",
+				date: "Sep 15",
+				type: 3
 			}
-		};
+		]
 	},
-	methods: {
-		openModal(statusValue) {
-			this.isOpen = true;
-			this.formState.status = statusValue;
-		},
-		closeModal() {
-			this.isOpen = false;
-		},
-		onsubmit() {
-		}
+	{
+		title: "In Progress",
+		tasks: [
+			{
+				id: 6,
+				title: "Design shopping cart dropdown",
+				date: "Sep 9",
+				type: 2
+			},
+			{
+				id: 7,
+				title: "Add discount code to checkout page",
+				date: "Sep 14",
+				type: 1
+			},
+			{
+				id: 8,
+				title: "Provide documentation on integrations",
+				date: "Sep 12",
+				type: 4
+			}
+		]
+	},
+	{
+		title: "Review",
+		tasks: [
+			{
+				id: 9,
+				title: "Provide documentation on integrations",
+				date: "Sep 12"
+			},
+			{
+				id: 10,
+				title: "Design shopping cart dropdown",
+				date: "Sep 9",
+				type: 2
+			},
+			{
+				id: 11,
+				title: "Add discount code to checkout page",
+				date: "Sep 14",
+				type: 1
+			},
+			{
+				id: 12,
+				title: "Design shopping cart dropdown",
+				date: "Sep 9",
+				type: 2
+			},
+			{
+				id: 13,
+				title: "Add discount code to checkout page",
+				date: "Sep 14",
+				type: 1
+			}
+		]
+	},
+	{
+		title: "Done",
+		tasks: [
+			{
+				id: 14,
+				title: "Add discount code to checkout page",
+				date: "Sep 14",
+				type: 1
+			},
+			{
+				id: 15,
+				title: "Design shopping cart dropdown",
+				date: "Sep 9",
+				type: 2
+			},
+			{
+				id: 16,
+				title: "Add discount code to checkout page",
+				date: "Sep 14",
+				type: 1
+			}
+		]
 	}
-};
+]
+
+async function onSubmit (event: FormSubmitEvent<Schema>) {
+  // Do something with data
+  console.log(event.data)
+}
+
+async function  test() {
+	const ttt = $fetch.create({
+    	baseURL: useRuntimeConfig().public.apiBase
+	});
+	console.log(ttt)
+}
+
+test()
+
+console.log(useRuntimeConfig().public.apiBase)
 </script>
 
 <style lang="css" scoped>

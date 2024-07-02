@@ -9,24 +9,25 @@
 
 			<div class="absolute top-0 right-0  flex items-center justify-center hidden w-5 h-5 group-hover:flex">
 				<UDropdown :items="[
-			[
-				{
-					label: 'Edit',
-					icon: 'i-heroicons-pencil-square-20-solid',
-					click: () => edit(task.id)
-				},
-				{
-					label: 'Delete',
-					icon: 'i-heroicons-trash-20-solid',
-					click: () => delete(task.id)
-				}
-			]
-		]
-			" :popper="{ placement: 'bottom-start' }">
+					[
+						{
+							label: 'Edit',
+							icon: 'i-heroicons-pencil-square-20-solid',
+							click: () => edit(task.id)
+						},
+						{
+							label: 'Delete',
+							icon: 'i-heroicons-trash-20-solid',
+							click: () => deleteTask(task.id)
+						}
+					]
+				]
+					" :popper="{ placement: 'bottom-start' }">
 					<button class="text-gray-500 hover:bg-gray-200 hover:text-gray-700 rounded">
 						<svg class="w-6 h-6 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
 							fill="currentColor">
-							<path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+							<path
+								d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
 						</svg>
 					</button>
 				</UDropdown>
@@ -38,44 +39,40 @@
 		</div>
 	</div>
 </template>
-<script>
-export default {
-	props: {
-		task: {
-			type: Object,
-			default: () => ({})
-		},
-	},
-	data() {
-		return {
-			active: true,
-		}
-	},
-	computed: {
-		badgeColor() {
-			const mappings = {
-				Design: "red",
-				"Feature Request": "teal",
-				Backend: "orange",
-				QA: "green",
-				default: "orange"
-			};
-			return mappings[typeTask[this.task.type]] || mappings.default;
-		}
-	},
-	methods: {
-		hoverOver() {
-			this.active = false;
-		},
-		hoverOut() {
-			this.active = true;
-		},
-		edit(id) {
-
-		},
-		delete(id) {
-
-		}
+<script setup lang="ts">
+const props = defineProps({
+	task: {
+		type: Object,
+		default: () => ({})
 	}
-};
+})
+
+const active = ref(true)
+
+const badgeColor = computed(() => {
+	const mappings = {
+		Design: "red",
+		"Feature Request": "teal",
+		Backend: "orange",
+		QA: "green",
+		default: "orange"
+	};
+	return mappings[typeTask[props.task.type]] || mappings.default;
+})
+
+const hoverOver = () => {
+	active.value = false;
+}
+
+const hoverOut = () => {
+	active.value = true;
+}
+
+const edit = (id) => {
+
+}
+
+const deleteTask = (id) => {
+
+}
 </script>

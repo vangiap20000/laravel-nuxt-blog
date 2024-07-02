@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
 export const RegisterValidationSchema = z.object({
-    title: z.string().max(255),
+    title: z.string().min(1, { message: 'Field is required' }).max(255),
     content: z.string(),
-    type,
-    status,
+    type: z.string(),
+    status: z.string(),
 })
