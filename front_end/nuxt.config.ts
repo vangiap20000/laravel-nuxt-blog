@@ -4,9 +4,8 @@ export default defineNuxtConfig({
   ssr: true,
   srcDir: 'src/',
   modules: [
-    '@nuxtjs/tailwindcss',
     '@nuxt/eslint',
-    '@nuxt/ui'
+    '@nuxt/ui',
   ],
   eslint: {
     config: {
@@ -22,12 +21,6 @@ export default defineNuxtConfig({
       title: 'Laravel nuxt blog',
       charset: 'utf-8',
       viewport: 'width=device-width, initial-scale=1',
-    },
-  },
-  postcss: {
-    plugins: {
-      tailwindcss: {},
-      autoprefixer: {},
     },
   },
 });
