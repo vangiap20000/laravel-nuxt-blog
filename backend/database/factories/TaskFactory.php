@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\TaskStatus;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -23,11 +24,13 @@ class TaskFactory extends Factory
      */
     public function definition(): array
     {
+        $statusId = TaskStatus::pluck('id');
+        
         return [
-            'sep' => rand(1, 40),
             'title' => fake()->name(),
             'content' => fake()->text,
             'type' => rand(1, 4),
+            'status' => fake()->randomElement($statusId)
         ];
     }
 }

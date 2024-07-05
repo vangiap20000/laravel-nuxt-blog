@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
-            $table->integer('sep');
             $table->string('title', 255);
             $table->text('content');
-            $table->integer('type');
+            $table->integer('type')->comment('1: Feature; 2: Request; 3: QA; 4: Backend');
+            $table->unsignedBigInteger('status');
+            $table->foreign('status')->references('id')->on('task_status')->onDelete('cascade');
             $table->timestamps();
         });
     }

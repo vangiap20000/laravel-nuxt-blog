@@ -11,8 +11,7 @@ class TaskController extends Controller
 
     public function __construct(
         Task $takModel
-    )
-    {
+    ) {
         $this->taskModel = $takModel;
     }
 
@@ -25,7 +24,8 @@ class TaskController extends Controller
     public function index()
     {
         try {
-            return response()->json($this->taskModel->all(), 200);
+            $tasks = $this->taskModel->with('status')->select(['id', 'title', 'type', 'content', 'created_at as date', 'status'])->get()->groupBy('status');
+            return response()->json($tasks, 200);
         } catch (\Exception $exception) {
             return $this->resultRest(500, $exception);
         }
@@ -72,7 +72,7 @@ class TaskController extends Controller
             if (!$result) {
                 return $this->resultRest(500, 'Fail');
             }
-            
+
             return $this->resultRest();
         } catch (\Exception $exception) {
             return $this->resultRest(500, $exception);

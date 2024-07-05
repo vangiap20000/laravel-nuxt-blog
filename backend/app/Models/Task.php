@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 class Task extends Model
 {
@@ -15,9 +17,28 @@ class Task extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'sep',
         'title',
         'content',
         'type',
+        'status',
     ];
+
+    /**
+     * Get the status that owns the task_status.
+     */
+    public function status(): BelongsTo
+    {
+        return $this->belongsTo(TaskStatus::class, 'status', 'id');
+    }
+
+    /**
+     * Get the created_at attribute.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function getDateAttribute($value)
+    {
+        return Carbon::parse($value)->format('D F');
+    }
 }

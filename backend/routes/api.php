@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TaskStatusController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,4 +26,5 @@ Route::group(['prefix'=>'tasks'], function () {
     Route::post('/', [TaskController::class, 'store']);
     Route::put('/{task}', [TaskController::class, 'update']);
     Route::delete('/{task}', [TaskController::class, 'destroy']);
+    Route::get('/status', [TaskStatusController::class, 'index']);
 });

@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\TaskStatus;
+use App\Models\Task;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,12 +15,18 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // \App\Models\User::factory(10)->create();
+        $this->call(TaskStatusSeeder::class);
 
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        $statusIds = TaskStatus::pluck('id');
+        foreach ($statusIds as $key => $statusId) {
+            Task::factory()->create([
+                'title' => fake()->name(),
+                'content' => fake()->text,
+                'type' => rand(1, 4),
+                'status' => $statusId
+            ]);
+        }
 
-        \App\Models\Task::factory(10)->create();
+        Task::factory(10)->create();
     }
 }
