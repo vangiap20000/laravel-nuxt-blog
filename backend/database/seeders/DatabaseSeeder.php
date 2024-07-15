@@ -19,11 +19,11 @@ class DatabaseSeeder extends Seeder
 
         $statusIds = TaskStatus::pluck('id');
         foreach ($statusIds as $key => $statusId) {
-            Task::factory()->create([
+            Task::create([
                 'title' => fake()->name(),
                 'content' => fake()->text,
                 'type' => rand(1, 4),
-                'status' => $statusId
+                'status' => $statusId,
             ]);
         }
 

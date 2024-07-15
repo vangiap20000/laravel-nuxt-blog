@@ -33,7 +33,8 @@
 							</svg>
 						</button>
 					</div>
-					<draggable :list="column.tasks" :animation="200" ghost-class="ghost-card" group="tasks" @change="onMoveCallback">
+					<draggable :list="column.tasks" :animation="200"  class="min-h-52"
+						ghost-class="ghost-card" group="tasks" @end="moveTask" :statusId="findStatusByName(status, column.title).id">
 						<task-card v-for="(task) in column.tasks" :key="task.id" :task="task" class="mt-3 cursor-move"
 							@deleteTask="deleteTask" @editTask="editTask" />
 					</draggable>
@@ -83,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import { VueDraggableNext as draggable} from 'vue-draggable-next';
+import { VueDraggableNext as draggable } from 'vue-draggable-next';
 import { RegisterValidationSchema } from '../schemas/AddEditTask';
 
 const toast = useToast();
@@ -92,26 +93,26 @@ const pending = ref(false);
 const idTaskEdit = ref(null);
 const columns = useState();
 const { data: status, error } = await useFetch('/api/tasks/status', { server: false });
+const formData = {
+	title: "",
+	type: "",
+	status: "",
+	content: "",
+}
+const formState = reactive({ ... formData});
 
-const formState = reactive({
-	title: undefined,
-	type: undefined,
-	status: undefined,
-	content: undefined,
-});
-
-const openModal = (statusValue: number) => {
-	const statusId = status.value.find((element: any) => element.name == statusValue);
+const openModal = (statusValue: string) => {
+	const statusId = findStatusByName(status.value, statusValue);
+	if (idTaskEdit.value) idTaskEdit.value = null;
 	isOpen.value = true;
+	resetForm();
 	formState.status = statusId.id;
-	formState.title = undefined;
-	formState.type = undefined;
-	formState.content = undefined;
-	idTaskEdit.value = null;
 };
 
 const closeModal = () => {
 	isOpen.value = false;
+	if (idTaskEdit.value) idTaskEdit.value = null;
+	resetForm();
 };
 
 const editTask = async (task: any) => {
@@ -121,6 +122,10 @@ const editTask = async (task: any) => {
 	formState.type = task.type;
 	formState.content = task.content;
 	idTaskEdit.value = task.id;
+}
+
+const resetForm = () => {
+	Object.assign(formState, formData);
 }
 
 async function getColumns() {
@@ -143,13 +148,13 @@ async function getColumns() {
 }
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
+	if (pending.value == true || !event.data.status) return; 
 	pending.value = true;
-	closeModal();
 
 	const { data: responseData, status } = await useFetch('/api/tasks/', {
 		method: 'post',
 		body: event.data,
-		server: false
+		server: false,
 	})
 
 	if (status.value == 'success') {
@@ -157,19 +162,23 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 			title: 'Create new task success',
 			icon: 'i-heroicons-check-badge'
 		})
+		closeModal();
 		await getColumns();
+		resetForm();
 	} else {
 		toast.add({
 			color: 'red',
 			title: 'Create new task error',
 			icon: 'i-heroicons-exclamation-triangle'
-		})
+		});
+
+		pending.value = false;
 	}
 }
 
 async function onSubmitEdit(event: FormSubmitEvent<Schema>) {
+	if (pending.value == true || !event.data.status) return; 
 	pending.value = true;
-	closeModal();
 	const { data: responseData, status } = await useFetch(`/api/tasks/${idTaskEdit.value}`, {
 		method: 'put',
 		body: event.data,
@@ -181,13 +190,18 @@ async function onSubmitEdit(event: FormSubmitEvent<Schema>) {
 			title: 'Update task success',
 			icon: 'i-heroicons-check-badge'
 		})
+		closeModal();
 		await getColumns();
+		resetForm();
+		idTaskEdit.value = null;
 	} else {
 		toast.add({
 			color: 'red',
 			title: 'Update task error',
 			icon: 'i-heroicons-exclamation-triangle'
-		})
+		});
+
+		pending.value = false;
 	}
 }
 
@@ -208,16 +222,39 @@ async function deleteTask(id: number) {
 			color: 'red',
 			title: 'Delete task error',
 			icon: 'i-heroicons-exclamation-triangle'
-		})
+		});
+
+		pending.value = false;
 	}
 }
 
-async function onMoveCallback(event :any) {
-	console.log(event.moved)
-}
+async function moveTask(evt :any) {
+	if (pending.value == true) return; 
+	const data = {
+		id: evt.item.getAttribute('idTask'),
+		from_status: evt.from.getAttribute('statusId'), 
+		to_status: evt.to.getAttribute('statusId'),
+		new_order: evt.newIndex + 1,
+		old_order: evt.oldIndex + 1
+	}
 
-async function cloneAction(item :any) {
-  console.log("cloned", item);
+	const { data: responseData, status} = await useFetch('/api/tasks/move', {
+		method: 'post',
+		body: data,
+		server: false
+	});
+
+	if (status.value == 'success') {
+		await getColumns();
+	} else {
+		toast.add({
+			color: 'red',
+			title: 'Move task fail!',
+			icon: 'i-heroicons-exclamation-triangle'
+		});
+
+		pending.value = false;
+	}
 }
 
 onMounted(() => {

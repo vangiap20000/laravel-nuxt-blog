@@ -1,5 +1,5 @@
 <template>
-	<div class="bg-white shadow rounded px-3 pt-3 pb-5 border border-white">
+	<div class="bg-white shadow rounded px-3 pt-3 pb-5 border border-white" :idTask="task.id">
 		<div class="relative  cursor-pointer bg-opacity-90 group hover:bg-opacity-100" @mouseover="hoverOver"
 			@mouseout="hoverOut">
 			<div class="flex justify-between relative">
@@ -7,8 +7,10 @@
 					{{ task.title }}
 				</p>
 
-				<img v-if="active" class="w-6 h-6 rounded-full ml-3" src="https://randomuser.me/api/portraits/women/48.jpg"
+				<img v-if="active" class="w-6 h-6 rounded-full ml-3" src="https://avatar.iran.liara.run/public/job/farmer/female"
 					alt="Avatar">
+				<!-- <img v-if="active" class="w-6 h-6 rounded-full ml-3" :src="`https://avatars.githubusercontent.com/${task.id}?v=4`"
+					alt="Avatar"> -->
 
 				<div class="absolute top-0 right-0  flex items-center justify-center hidden w-5 h-5 group-hover:flex">
 					<UDropdown :items="[
@@ -96,11 +98,11 @@ const getTypeTask = (type: number) => {
 
 const badgeColor = computed(() => {
 	const mappings = {
-		'Design': 'red',
-		'Feature Request': 'teal',
-		'Backend': 'orange',
-		'QA': 'green',
-		'default': 'orange',
+		'Very High': 'red',
+		'High': 'orange',
+		'Medium': 'teal',
+		'Low': 'green',
+		'default': 'green',
 	};
 
 	return mappings[getTypeTask(props.task.type)] || mappings.default;

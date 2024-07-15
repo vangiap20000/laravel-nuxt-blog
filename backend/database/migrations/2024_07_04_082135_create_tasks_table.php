@@ -15,9 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('title', 255);
             $table->text('content');
-            $table->integer('type')->comment('1: Feature; 2: Request; 3: QA; 4: Backend');
+            $table->integer('type')->comment('1: Low; 2: Medium; 3: High; 4: Very high');
             $table->unsignedBigInteger('status');
             $table->foreign('status')->references('id')->on('task_status')->onDelete('cascade');
+            $table->unsignedInteger('order')->default(0);
             $table->timestamps();
         });
     }

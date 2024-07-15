@@ -1,5 +1,4 @@
 import { joinURL } from 'ufo';
-import { sendProxy } from "h3";
 
 export const { format: formatNumber } = Intl.NumberFormat('en-GB', {
   notation: 'compact',
@@ -9,19 +8,19 @@ export const { format: formatNumber } = Intl.NumberFormat('en-GB', {
 export const typeTask = [
   {
     id: 1,
-    name: 'Feature Request',
+    name: 'Low',
   },
   {
     id: 2,
-    name: 'Design',
+    name: 'Medium',
   },
   {
     id: 3,
-    name: 'QA',
+    name: 'High',
   },
   {
     id: 4,
-    name: 'Backend',
+    name: 'Very High',
   },
 ];
 
@@ -49,4 +48,8 @@ export const columnMaster = (data: any) => {
   }
 
   return result;
+}
+
+export const findStatusByName = (status :object | any, name: string) => {
+  return status.find((element: any) => element.name == name);
 }
