@@ -7,24 +7,17 @@ use Illuminate\Http\Request;
 
 class TaskStatusController extends Controller
 {
-    protected $taskStatusModel;
-
-    public function __construct(
-        TaskStatus $taskStatusModel
-    )
-    {
-        $this->taskStatusModel = $taskStatusModel;
-    }
-
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(TaskStatus $taskStatus)
     {
         try {
-            return response()->json($this->taskStatusModel->all(), 200);
+            return response()->json($taskStatus->all(), 200);
         } catch (\Exception $exception) {
-            return $this->resultRest(500, $exception);
+            $message = $exception->getMessage();
+            logger($message);
+            return $this->resultRest(500, $message);
         }
     }
 

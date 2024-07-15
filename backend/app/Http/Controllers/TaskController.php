@@ -4,15 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Task;
+use App\Services\Task\TaskServiceInterface;
 
 class TaskController extends Controller
 {
-    protected $taskModel;
+    protected $taskService;
 
     public function __construct(
-        Task $takModel
+        TaskServiceInterface $taskService
     ) {
-        $this->taskModel = $takModel;
+        $this->taskService = $taskService;
     }
 
 
@@ -21,13 +22,23 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Task $task)
     {
         try {
-            $tasks = $this->taskModel->with('status')->select(['id', 'title', 'type', 'content', 'created_at as date', 'status'])->get()->groupBy('status');
+            $tasks = $task
+                ->with('status')
+                ->select(
+                    ['id', 'title', 'type', 'content', 'created_at as date', 'order', 'status']
+                )
+                ->orderBy('order')
+                ->get()
+                ->groupBy('status');
+
             return response()->json($tasks, 200);
         } catch (\Exception $exception) {
-            return $this->resultRest(500, $exception);
+            $message = $exception->getMessage();
+            logger($message);
+            return $this->resultRest(500, $message);
         }
     }
 
@@ -37,10 +48,12 @@ class TaskController extends Controller
     public function store(Request $request)
     {
         try {
-            $this->taskModel->create($request->all());
+            $this->taskService->create($request->all());
             return $this->resultRest();
         } catch (\Exception $exception) {
-            return $this->resultRest(500, $exception);
+            $message = $exception->getMessage();
+            logger($message);
+            return $this->resultRest(500, $message);
         }
     }
 
@@ -58,7 +71,9 @@ class TaskController extends Controller
 
             return $this->resultRest();
         } catch (\Exception $exception) {
-            return $this->resultRest(500, $exception);
+            $message = $exception->getMessage();
+            logger($message);
+            return $this->resultRest(500, $message);
         }
     }
 
@@ -75,7 +90,22 @@ class TaskController extends Controller
 
             return $this->resultRest();
         } catch (\Exception $exception) {
-            return $this->resultRest(500, $exception);
+            $message = $exception->getMessage();
+            logger($message);
+            return $this->resultRest(500, $message);
+        }
+    }
+
+    public function handelMove(Request $request)
+    {
+        try {
+            $this->taskService->updatePositionTask($request->all());
+
+            return $this->resultRest();
+        } catch (\Exception $exception) {
+            $message = $exception->getMessage();
+            logger($message);
+            return $this->resultRest(500, $message);
         }
     }
 }

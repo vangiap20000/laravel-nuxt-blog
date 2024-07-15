@@ -21,6 +21,7 @@ class Task extends Model
         'content',
         'type',
         'status',
+        'order'
     ];
 
     /**
@@ -40,5 +41,15 @@ class Task extends Model
     public function getDateAttribute($value)
     {
         return Carbon::parse($value)->format('D F');
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $maxOrder = self::where('status', $model->status)->max('order');
+            $model->order = $maxOrder + 1;
+        });
     }
 }
