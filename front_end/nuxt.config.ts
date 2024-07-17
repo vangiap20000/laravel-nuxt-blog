@@ -6,7 +6,11 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
     '@nuxt/ui',
+    '@pinia/nuxt'
   ],
+  devServer: {
+    port: process.env.PORT ? parseInt(process.env.PORT): 3000
+  },
   eslint: {
     config: {
       stylistic: {
@@ -25,13 +29,13 @@ export default defineNuxtConfig({
   },
   nitro: {
     devProxy: {
-      '/api': { target: 'http://127.0.0.1:8000/api', changeOrigin: true }
+      '/api': { target: process.env.NITRO_API_URL ?? 'http://localhost:8000/', changeOrigin: true }
     }
   },
   runtimeConfig: {
     apiSecret: '', // can be overridden by NUXT_API_SECRET environment variable
     public: {
-      apiBase: process.env.BASE_URL || 'http://127.0.0.1:8000/', // can be overridden by NUXT_PUBLIC_API_BASE environment variable
+      apiBase: process.env.BASE_URL || 'http://localhost:8000/', // can be overridden by NUXT_PUBLIC_API_BASE environment variable
     },
   },
 });
