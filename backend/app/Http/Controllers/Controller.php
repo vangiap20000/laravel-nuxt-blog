@@ -14,4 +14,9 @@ class Controller extends BaseController
     {
         return response()->json(['message' => $mess], $status);
     }
+
+    public function resultRestMultiple($status = 200, $data = [])
+    {
+        return response()->json($data, $status);
+    }
 }

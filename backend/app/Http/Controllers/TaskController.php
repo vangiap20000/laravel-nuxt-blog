@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TaskMoveRequest;
+use App\Http\Requests\TaskRequest;
 use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Services\Task\TaskServiceInterface;
@@ -45,7 +47,7 @@ class TaskController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(TaskRequest $request)
     {
         try {
             $this->taskService->create($request->all());
@@ -61,7 +63,7 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Task $task)
+    public function update(TaskRequest $request, Task $task)
     {
         try {
             $result = $task->update($request->all());
@@ -96,7 +98,7 @@ class TaskController extends Controller
         }
     }
 
-    public function handelMove(Request $request)
+    public function handelMove(TaskMoveRequest $request)
     {
         try {
             $this->taskService->updatePositionTask($request->all());
