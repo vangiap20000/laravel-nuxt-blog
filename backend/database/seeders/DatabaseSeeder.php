@@ -6,6 +6,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\TaskStatus;
 use App\Models\Task;
+use App\Models\User;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,12 +15,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\User::factory(5)->create();
+        User::factory(5)->create();
         $this->call(TaskStatusSeeder::class);
 
         $statusIds = TaskStatus::pluck('id');
+        $userId = User::first()->id;
         foreach ($statusIds as $key => $statusId) {
             Task::create([
+                'user_id' => $userId,
                 'title' => fake()->name(),
                 'content' => fake()->text,
                 'type' => rand(1, 4),

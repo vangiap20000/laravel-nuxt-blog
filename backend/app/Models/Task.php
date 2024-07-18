@@ -17,6 +17,7 @@ class Task extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'user_id',
         'title',
         'content',
         'type',
@@ -25,11 +26,19 @@ class Task extends Model
     ];
 
     /**
-     * Get the status that owns the task_status.
+     * Get the status that owns the tasks.
      */
     public function status(): BelongsTo
     {
         return $this->belongsTo(TaskStatus::class, 'status', 'id');
+    }
+
+    /**
+     * Get the user that owns the tasks.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(TaskStatus::class);
     }
 
     /**
@@ -48,7 +57,11 @@ class Task extends Model
         parent::boot();
 
         static::creating(function ($model) {
-            $maxOrder = self::where('status', $model->status)->max('order');
+            if (auth('web')->check()) {
+                $maxOrder = self::where('status', $model->status)->where('user_id', auth()->user()->id)->max('order');
+            } else {
+                $maxOrder = self::where('status', $model->status)->where('user_id', 1)->max('order');
+            }
             $model->order = $maxOrder + 1;
         });
     }

@@ -45,13 +45,15 @@ class AuthService extends AbstractBaseService implements AuthServiceInterface {
     {
         try {
             DB::beginTransaction();
-            $user = $this->model->create([
+            $this->create([
                 'name' => $attributes['name'],
                 'email' => $attributes['email'],
                 'password' => $attributes['password'],
             ]);
-    
             DB::commit();
+
+            $user = $this->findBy('email', $attributes['email']);
+            Auth::login($user);
             
             return $user;
         } catch (\Throwable $th) {

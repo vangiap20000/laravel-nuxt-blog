@@ -4,8 +4,7 @@
 			<div class="min-h-screen flex overflow-x-scroll py-12">
 				<div v-if="pending" class="fixed w-full h-full bg-[#ffffff]/50 top-0 left-0 z-[60]">
 					<div role="status" class="absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2">
-						<svg aria-hidden="true"
-							class="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-green-600"
+						<svg aria-hidden="true" class="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-green-600"
 							viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
 							<path
 								d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
@@ -30,13 +29,12 @@
 							class="flex items-center justify-center w-6 h-6 ml-auto text-indigo-500 rounded hover:bg-indigo-500 hover:text-indigo-100"
 							@click="openModal(column.title)">
 							<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-									d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
 							</svg>
 						</button>
 					</div>
-					<draggable :list="column.tasks" :animation="200" class="min-h-52" ghost-class="ghost-card"
-						group="tasks" @end="moveTask" :statusId="findStatusByName(status, column.title).id">
+					<draggable :list="column.tasks" :animation="200" class="min-h-52" ghost-class="ghost-card" group="tasks"
+						@end="moveTask" :statusId="findStatusByName(status, column.title).id">
 						<task-card v-for="(task) in column.tasks" :key="task.id" :task="task" class="mt-3 cursor-move"
 							@deleteTask="deleteTask" @editTask="editTask" />
 					</draggable>
@@ -58,13 +56,13 @@
 					</UFormGroup>
 
 					<UFormGroup label="Type" name="type">
-						<USelectMenu v-model="formState.type" :options="typeTask" placeholder="Select type"
-							value-attribute="id" option-attribute="name" />
+						<USelectMenu v-model="formState.type" :options="typeTask" placeholder="Select type" value-attribute="id"
+							option-attribute="name" />
 					</UFormGroup>
 
 					<UFormGroup label="Status" name="status">
-						<USelectMenu v-model="formState.status" :options="status" placeholder="Select status"
-							value-attribute="id" option-attribute="name" />
+						<USelectMenu v-model="formState.status" :options="status" placeholder="Select status" value-attribute="id"
+							option-attribute="name" />
 					</UFormGroup>
 
 					<UFormGroup label="Content" name="content">
@@ -162,18 +160,10 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 	pending.value = true;
 
 	await useApiFetch("sanctum/csrf-cookie");
-	const token = useCookie('XSRF-TOKEN');
-	const headers: any = {
-		Accept: 'application/json',
-		'X-XSRF-TOKEN': token.value,
-	}
 
-	const { status } = await useFetch('/api/tasks/', {
+	const { status } = await useApiFetch('api/tasks/', {
 		method: 'post',
 		body: event.data,
-		server: false,
-		watch: false,
-		headers,
 	});
 
 	if (status.value == 'success') {
@@ -200,18 +190,10 @@ async function onSubmitEdit(event: FormSubmitEvent<Schema>) {
 	pending.value = true;
 
 	await useApiFetch("sanctum/csrf-cookie");
-	const token = useCookie('XSRF-TOKEN');
-	const headers: any = {
-		Accept: 'application/json',
-		'X-XSRF-TOKEN': token.value,
-	}
 
-	const { data: responseData, status } = await useFetch(`/api/tasks/${idTaskEdit.value}`, {
+	const { status } = await useApiFetch(`api/tasks/${idTaskEdit.value}`, {
 		method: 'put',
 		body: event.data,
-		server: false,
-		watch: false,
-		headers
 	})
 
 	if (status.value == 'success') {
@@ -237,16 +219,10 @@ async function onSubmitEdit(event: FormSubmitEvent<Schema>) {
 async function deleteTask(id: number) {
 
 	await useApiFetch("sanctum/csrf-cookie");
-	const token = useCookie('XSRF-TOKEN');
-	const headers: any = {
-		Accept: 'application/json',
-		'X-XSRF-TOKEN': token.value,
-	}
 
-	const { data: responseData, status, error } = await useFetch(`/api/tasks/${id}`, {
+	const { status } = await useApiFetch(`api/tasks/${id}`, {
 		method: 'delete',
 		server: false,
-		headers
 	});
 
 	if (status.value == 'success') {
@@ -270,11 +246,6 @@ async function moveTask(evt: any) {
 	if (pending.value == true) return;
 
 	await useApiFetch("sanctum/csrf-cookie");
-	const token = useCookie('XSRF-TOKEN');
-	const headers: any = {
-		Accept: 'application/json',
-		'X-XSRF-TOKEN': token.value,
-	}
 
 	const data = {
 		id: evt.item.getAttribute('idTask'),
@@ -284,11 +255,9 @@ async function moveTask(evt: any) {
 		old_order: evt.oldIndex + 1
 	}
 
-	const { data: responseData, status } = await useFetch('/api/tasks/move', {
+	const { status } = await useApiFetch('api/tasks/move', {
 		method: 'post',
-		body: data,
-		server: false,
-		headers
+		body: data
 	});
 
 	if (status.value == 'success') {

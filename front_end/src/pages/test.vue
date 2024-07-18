@@ -1,8 +1,35 @@
 <script setup lang="ts">
-const { data, error } = await useFetch('/api/tasks/', { server: false });
+import { useAuthStore } from "~/stores/useAuthStore";
+
+const auth = useAuthStore();
+async function test() {
+  await useApiFetch("sanctum/csrf-cookie");
+	const token = useCookie('XSRF-TOKEN');
+	const headers: any = {
+		Accept: 'application/json',
+		'X-XSRF-TOKEN': token.value,
+	}
+
+	const { data, status, error } = await useFetch('/api/test', {
+    method: 'post',
+    headers,
+  });
+  // console.log(data, error)
+  if (status.value == 'success') {
+    await auth.fetchUser();
+    await navigateTo('/');
+  }
+}
+
+definePageMeta({
+	layout: 'auth',
+});
 </script>
 
 <template>
-  <pre>{{  error  }}</pre>
-  <pre>{{ data }}</pre>
+  <div>
+    <UButton color="emerald" variant="solid" @click="test">
+			Test
+		</UButton>
+  </div>
 </template>

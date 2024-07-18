@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\TaskMoveRequest;
 use App\Http\Requests\TaskRequest;
-use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Services\Task\TaskServiceInterface;
 
@@ -32,6 +31,7 @@ class TaskController extends Controller
                 ->select(
                     ['id', 'title', 'type', 'content', 'created_at as date', 'order', 'status']
                 )
+                ->where('user_id', auth('web')->user()->id)
                 ->orderBy('order')
                 ->get()
                 ->groupBy('status');
@@ -50,7 +50,10 @@ class TaskController extends Controller
     public function store(TaskRequest $request)
     {
         try {
-            $this->taskService->create($request->all());
+            $data = $request->all();
+            $data['user_id'] = auth('web')->user()->id;
+            $this->taskService->create($data);
+
             return $this->resultRest();
         } catch (\Exception $exception) {
             $message = $exception->getMessage();

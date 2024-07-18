@@ -95,10 +95,6 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 			icon: 'i-heroicons-exclamation-triangle'
 		});
 	} else {
-		await auth.login({
-			email: data.email,
-			password: data.password
-		});
 		await auth.fetchUser();
 		await navigateTo('/');
 	}

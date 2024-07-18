@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use App\Models\TaskStatus;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\Task;
+use App\Models\User;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -24,8 +24,10 @@ class TaskFactory extends Factory
     public function definition(): array
     {
         $status = TaskStatus::pluck('id');
+        $userId = User::first()->id;;
 
         return [
+            'user_id' => $userId,
             'title' => fake()->name(),
             'content' => fake()->text,
             'type' => rand(1, 4),
