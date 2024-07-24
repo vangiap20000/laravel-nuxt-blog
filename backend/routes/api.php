@@ -38,7 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::resource('projects', ProjectController::class);
-    Route::group(['prefix'=>'projects/{projectId}', 'middleware' => 'checkProject'], function () {
+    Route::group(['prefix'=>'projects-task/{projectId}', 'middleware' => 'checkProject'], function () {
         Route::get('/', [ProjectTaskController::class, 'index']);
         Route::post('/', [ProjectTaskController::class, 'store']);
         Route::put('/{projectTask}', [ProjectTaskController::class, 'update']);

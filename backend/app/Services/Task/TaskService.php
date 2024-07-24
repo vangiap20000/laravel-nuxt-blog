@@ -4,9 +4,12 @@ namespace App\Services\Task;
 
 use App\Models\Task;
 use App\Services\AbstractBaseService;
+use App\Supports\TaskSupports;
 
 class TaskService extends AbstractBaseService implements TaskServiceInterface
 {
+    use TaskSupports;
+
     /**
      * Get model.
      *
@@ -33,59 +36,10 @@ class TaskService extends AbstractBaseService implements TaskServiceInterface
         ]);
 
         if ($attributes['from_status'] == $attributes['to_status']) {
-            $this->updateSameStatus($attributes['from_status'], $attributes['id'], $attributes['new_order'], $attributes['old_order']);
+            $this->updateSameStatus($attributes['from_status'], $attributes['id'], null, $attributes['new_order'], $attributes['old_order']);
         } else {
-            $this->updateDifferentStatus($attributes['from_status'], $attributes['id'], null, $attributes['old_order']);
-            $this->updateDifferentStatus($attributes['to_status'], $attributes['id'], $attributes['new_order']);
-        }
-    }
-
-    protected function updateDifferentStatus($statusId, $id, $newIndex = null, $oldIndex = null)
-    {
-        $tasks = $this->model->where([
-            'status' => $statusId,
-            'user_id' => auth('web')->user()->id
-        ])->whereNot('id', $id);
-
-        if ($oldIndex) {
-            $tasks->where('order', '>', $oldIndex)->decrement('order');
-            $this->resetOrder($statusId);
-
-            return true;
-        }
-
-        $tasks->where('order', '>=', $newIndex)->increment('order');
-        $this->resetOrder($statusId);
-
-        return true;
-    }
-
-    protected function updateSameStatus($statusId, $id, $newIndex = null, $oldIndex = null)
-    {
-        $tasks = $this->model->where([
-            'status' => $statusId,
-            'user_id' => auth('web')->user()->id
-        ])->whereNot('id', $id);
-
-        if ($newIndex < $oldIndex) {
-            $tasks->where('order', '<', $oldIndex)->where('order', '>=', $newIndex)->increment('order');
-        } else {
-            $tasks->where('order', '<=', $newIndex)->where('order', '>', $oldIndex)->decrement('order');
-        }
-
-        $this->resetOrder($statusId);
-    }
-
-    public function resetOrder($statusId)
-    {
-        $tasks = $this->model
-            ->where([
-                'status' => $statusId,
-                'user_id' => auth('web')->user()->id
-            ])
-            ->orderBy('order')->get();
-        foreach ($tasks as $key => $task) {
-            $this->update($task->id, ['order' => $key + 1]);
+            $this->updateDifferentStatus($attributes['from_status'], $attributes['id'], null, null, $attributes['old_order']);
+            $this->updateDifferentStatus($attributes['to_status'], $attributes['id'], null, $attributes['new_order']);
         }
     }
 }

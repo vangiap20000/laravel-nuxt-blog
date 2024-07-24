@@ -8,11 +8,11 @@ type Project = {
 
 export const useProjectStore = defineStore('project', () => {
     const project = ref<Project | null>(null)
-    const isProject = computed(() => !!project.value)
+    const isProject = computed(() => !!project.value);
 
-    async function fetchProject() {
+    async function fetchProject(id?: Number | null) {
         const { params } = useRoute();
-        const { data, status } = await useApiFetch(`api/projects/${params.id}`);
+        const { data, status } = await useApiFetch(`api/projects/${id ?? params.id}`);
         if (status.value == 'success') {
             project.value = data.value as Project;
         }

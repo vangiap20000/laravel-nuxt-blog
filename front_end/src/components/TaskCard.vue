@@ -7,10 +7,11 @@
 					{{ task.title }}
 				</p>
 
-				<img v-if="active" class="w-6 h-6 rounded-full ml-3" src="https://avatar.iran.liara.run/public/job/farmer/female"
+				<img v-if="active && task.user_id" class="w-6 h-6 rounded-full ml-3" :src="`https://avatars.githubusercontent.com/${task.user_id}?v=4`"
 					alt="Avatar">
-				<!-- <img v-if="active" class="w-6 h-6 rounded-full ml-3" :src="`https://avatars.githubusercontent.com/${task.id}?v=4`"
-					alt="Avatar"> -->
+
+				<img v-else-if="active" class="w-6 h-6 rounded-full ml-3" src="https://avatar.iran.liara.run/public/job/farmer/female"
+					alt="Avatar">
 
 				<div class="absolute top-0 right-0  flex items-center justify-center hidden w-5 h-5 group-hover:flex">
 					<UDropdown :items="[
@@ -41,7 +42,12 @@
 			<p class="text-sm text-gray-700 dark:text-gray-400 mt-2"> {{ task.content }}</p>
 		</div>
 		<div class="flex mt-4 justify-between items-center">
-			<span class="text-sm text-gray-600">{{ task.date }}</span>
+			<div class="text-sm text-gray-600">
+				<span>{{ task.date }}</span>
+				<p v-if="task.user_id" class="font-semibold italic">
+					{{ task.user.email }}
+				</p>
+			</div>
 			<Badge v-if="task.type" :color="badgeColor">
 				{{ getTypeTask(task.type) }}
 			</Badge>

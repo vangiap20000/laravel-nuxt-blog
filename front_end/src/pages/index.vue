@@ -33,7 +33,7 @@
 				<template #header>
 					<div class="flex items-center justify-between">
 						<h3 class="text-xl font-medium text-gray-900 dark:text-white">
-							{{ idTaskEdit ? 'Edit task' : 'Create new task' }}
+							{{ formState.task_id ? 'Edit task' : 'Create new task' }}
 						</h3>
 						<UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
 							@click="isOpen = false" />
@@ -41,7 +41,7 @@
 				</template>
 
 				<UForm :schema="RegisterValidationSchema" :state="formState" class="space-y-4"
-					@submit="(event: any) => idTaskEdit ? onSubmitEdit(event) : onSubmit(event)">
+					@submit="onSubmit">
 					<UFormGroup label="Title" name="title" size="lg">
 						<UInput v-model="formState.title" placeholder="Title" />
 					</UFormGroup>
@@ -60,8 +60,8 @@
 						<UTextarea v-model="formState.content" placeholder="Content" />
 					</UFormGroup>
 
-					<div>
-						<UButton type="submit" size="lg" :disabled="pending">
+					<div class="flex">
+						<UButton type="submit" size="lg" :loading="loading">
 							Submit
 						</UButton>
 						<UButton color="white" variant="solid" size="lg" type="button" class="ml-2" @click="closeModal">
@@ -80,7 +80,7 @@ import { RegisterValidationSchema } from '../schemas/AddEditTask';
 import { useStore } from "../stores/useStore";
 
 useHead({
-	title: 'Home',
+	title: 'Task',
 });
 
 definePageMeta({
@@ -89,7 +89,6 @@ definePageMeta({
 
 const toast = useToast();
 const isOpen = ref(false);
-const idTaskEdit = ref(null);
 const columns = useState();
 const { data: status, error } = await useFetch('/api/tasks/status', { server: false });
 const formData = {
@@ -97,13 +96,14 @@ const formData = {
 	type: "",
 	status: "",
 	content: "",
+	task_id: null,
 }
 const formState = reactive({ ...formData });
 const { setPending } = useStore();
+const loading = ref(false);
 
 const openModal = (statusValue: string) => {
 	const statusId = findStatusByName(status.value, statusValue);
-	if (idTaskEdit.value) idTaskEdit.value = null;
 	isOpen.value = true;
 	resetForm();
 	formState.status = statusId.id;
@@ -111,7 +111,6 @@ const openModal = (statusValue: string) => {
 
 const closeModal = () => {
 	isOpen.value = false;
-	if (idTaskEdit.value) idTaskEdit.value = null;
 	resetForm();
 };
 
@@ -121,7 +120,7 @@ const editTask = async (task: any) => {
 	formState.title = task.title;
 	formState.type = task.type;
 	formState.content = task.content;
-	idTaskEdit.value = task.id;
+	formState.task_id = task.id;
 }
 
 const resetForm = () => {
@@ -148,14 +147,29 @@ async function getColumns() {
 }
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-	if (!event.data.status) return;
+	loading.value = true;
+	await useApiFetch("sanctum/csrf-cookie");
+	let data = { ...event.data };
+	delete data['task_id'];
+
+	if (formState.task_id) {
+		await update(data);
+	} else {
+		await store(data);
+	}
+
+	loading.value = false;
+}
+
+
+async function store(data: Object) {
 	setPending(true);
 
 	await useApiFetch("sanctum/csrf-cookie");
 
 	const { status } = await useApiFetch('api/tasks/', {
 		method: 'post',
-		body: event.data,
+		body: data,
 	});
 
 	if (status.value == 'success') {
@@ -165,7 +179,6 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 		})
 		closeModal();
 		await getColumns();
-		resetForm();
 	} else {
 		toast.add({
 			color: 'red',
@@ -177,15 +190,14 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 	}
 }
 
-async function onSubmitEdit(event: FormSubmitEvent<Schema>) {
-	if (!event.data.status) return;
+async function update(data: Object) {
 	setPending(true);
 
 	await useApiFetch("sanctum/csrf-cookie");
 
-	const { status } = await useApiFetch(`api/tasks/${idTaskEdit.value}`, {
+	const { status } = await useApiFetch(`api/tasks/${formState.task_id}`, {
 		method: 'put',
-		body: event.data,
+		body: data,
 	})
 
 	if (status.value == 'success') {
@@ -195,8 +207,6 @@ async function onSubmitEdit(event: FormSubmitEvent<Schema>) {
 		})
 		closeModal();
 		await getColumns();
-		resetForm();
-		idTaskEdit.value = null;
 	} else {
 		toast.add({
 			color: 'red',

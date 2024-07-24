@@ -39,7 +39,7 @@ class ProjectTask extends Model
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(TaskStatus::class);
+        return $this->belongsTo(User::class);
     }
 
     /**
@@ -47,7 +47,7 @@ class ProjectTask extends Model
      */
     public function project(): BelongsTo
     {
-        return $this->belongsTo(TaskStatus::class);
+        return $this->belongsTo(Project::class);
     }
 
     /**

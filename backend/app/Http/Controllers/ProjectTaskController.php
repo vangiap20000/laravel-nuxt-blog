@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TaskMoveRequest;
 use App\Http\Requests\TaskRequest;
 use App\Models\ProjectTask;
 use App\Services\ProjectTask\ProjectTaskServiceInterface;
@@ -23,9 +24,9 @@ class ProjectTaskController extends Controller
     {
         try {
             $projectTasks = $projectTask
-                ->with('status')
+                ->with(['status', 'user'])
                 ->select(
-                    ['id', 'title', 'type', 'content', 'created_at as date', 'order', 'status']
+                    ['id', 'title', 'type', 'user_id','content', 'created_at as date', 'order', 'status']
                 )
                 ->where('project_id', $projectId)
                 ->orderBy('order')
@@ -87,7 +88,7 @@ class ProjectTaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(TaskRequest $request, ProjectTask $projectTask)
+    public function update(TaskRequest $request, $projectId, ProjectTask $projectTask)
     {
         try {
             $result = $projectTask->update($request->all());
@@ -106,13 +107,26 @@ class ProjectTaskController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ProjectTask $projectTask)
+    public function destroy($projectId, ProjectTask $projectTask)
     {
         try {
             $result = $projectTask->delete();
             if (!$result) {
                 return $this->resultRest(500, 'Fail');
             }
+
+            return $this->resultRest();
+        } catch (\Exception $exception) {
+            $message = $exception->getMessage();
+            logger($message);
+            return $this->resultRest(500, $message);
+        }
+    }
+
+    public function handelMove(TaskMoveRequest $request, $projectId)
+    {
+        try {
+            $this->projectTaskService->updatePositionTask($projectId, $request->all());
 
             return $this->resultRest();
         } catch (\Exception $exception) {

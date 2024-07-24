@@ -42,14 +42,14 @@
 					+{{ project.users.length - 3 }}
 				</a>
 			</div>
-			<NuxtLink :to="`project/${project.id}`" class="inline-flex items-center font-medium text-primary-600 dark:text-primary-500 hover:underline">
+			<div @click="toProject(project.id)" class="cursor-pointer inline-flex items-center font-medium text-primary-600 dark:text-primary-500 hover:underline">
 				See details
 				<svg class="ml-2 w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
 					<path fill-rule="evenodd"
 						d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
 						clip-rule="evenodd"></path>
 				</svg>
-			</NuxtLink>
+			</div>
 		</div>
 	</article>
 	<UModal v-model="isOpen" :overlay="false">
@@ -85,6 +85,8 @@
 </template>
 
 <script setup lang="ts">
+import { useStore } from "../stores/useStore";
+
 const props = defineProps({
 	project: {
 		type: Object,
@@ -94,6 +96,8 @@ const props = defineProps({
 
 const isOpen = ref(false);
 const emit = defineEmits(['deleteProject', 'editProject']);
+const { $loadProject } = useNuxtApp();
+const { setPending } = useStore();
 
 const edit = (project: Object) => {
 	emit('editProject', project);
@@ -102,5 +106,11 @@ const edit = (project: Object) => {
 const deleteProject = (id: number) => {
 	emit('deleteProject', id);
 	isOpen.value = false;
+}
+
+const toProject = async(id: Number) => {
+	setPending(true);
+	await $loadProject(id);
+	navigateTo(`/project/${id}`);
 }
 </script>
