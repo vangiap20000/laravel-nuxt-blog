@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
-class Task extends Model
+class ProjectTask extends Model
 {
     use HasFactory;
 
@@ -17,6 +17,7 @@ class Task extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'project_id',
         'user_id',
         'title',
         'content',
@@ -26,7 +27,7 @@ class Task extends Model
     ];
 
     /**
-     * Get the status that owns the tasks.
+     * Get the status that owns the project_tasks.
      */
     public function status(): BelongsTo
     {
@@ -34,9 +35,17 @@ class Task extends Model
     }
 
     /**
-     * Get the user that owns the tasks.
+     * Get the user that owns the project_tasks.
      */
     public function user(): BelongsTo
+    {
+        return $this->belongsTo(TaskStatus::class);
+    }
+
+    /**
+     * Get the project that owns the project_tasks.
+     */
+    public function project(): BelongsTo
     {
         return $this->belongsTo(TaskStatus::class);
     }
@@ -58,9 +67,15 @@ class Task extends Model
 
         static::creating(function ($model) {
             if (auth('web')->check()) {
-                $maxOrder = self::where('status', $model->status)->where('user_id', auth()->user()->id)->max('order');
+                $maxOrder = self::where('status', $model->status)
+                    ->where('user_id', auth()->user()->id)
+                    ->where('project_id', $model->project_id)
+                    ->max('order');
             } else {
-                $maxOrder = self::where('status', $model->status)->where('user_id', 1)->max('order');
+                $maxOrder = self::where('status', $model->status)
+                    ->where('user_id', 1)
+                    ->where('project_id', $model->project_id)
+                    ->max('order');
             }
             $model->order = $maxOrder + 1;
         });

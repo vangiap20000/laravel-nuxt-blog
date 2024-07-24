@@ -9,5 +9,13 @@ return [
         2 => 'Design',
         3 => 'QA',
         4 => 'Backend'
+    ],
+    'projects' => [
+        'role' => [
+            'value' => [
+                'owner' => 1,
+                'member' => 2,
+            ]
+        ]
     ]
 ];
