@@ -168,7 +168,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 async function store(data: Object) {
 	setPending(true);
 
-	const { status } = await useApiFetch(`api/projects-task/${idProject}/`, {
+	const { status } = await useApiFetch(`api/projects-task/${idProject}`, {
 		method: 'post',
 		body: data,
 	});
