@@ -1,5 +1,5 @@
 <template>
-	<article class="p-6 bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700">
+	<article class="p-6 bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700 min-w-[600px]">
 		<div class="flex justify-between items-center mb-5 text-gray-500">
 			<span v-if="project.days_since_created" class="text-sm">{{ project.days_since_created }} days ago</span>
 			<span v-else class="text-sm">Today</span>
