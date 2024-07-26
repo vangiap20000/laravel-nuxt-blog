@@ -167,7 +167,7 @@ async function store(data: Object) {
 
 	await useApiFetch("sanctum/csrf-cookie");
 
-	const { status } = await useApiFetch('api/tasks/', {
+	const { status } = await useApiFetch('api/tasks', {
 		method: 'post',
 		body: data,
 	});

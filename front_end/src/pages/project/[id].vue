@@ -133,7 +133,7 @@ const resetForm = () => {
 
 async function getColumns() {
 	setPending(true);
-	const { data: tasks, error } = await useApiFetch(`api/projects-task/${idProject}/`);
+	const { data: tasks, error } = await useApiFetch(`api/projects-task/${idProject}`);
 
 	if (!Object.keys(tasks.value).length) {
 		columns.value = columnMaster(status);
