@@ -92,7 +92,7 @@ definePageMeta({
 const toast = useToast();
 const isOpen = ref(false);
 const columns = useState();
-const { data: status, error } = await useApiFetch('api/tasks/status', { server: false });
+const { data: status, error } = await useApiFetch('api/tasks/status');
 const formData = {
 	title: "",
 	type: "",
@@ -133,7 +133,7 @@ const resetForm = () => {
 
 async function getColumns() {
 	setPending(true);
-	const { data: tasks, error } = await useApiFetch(`api/projects-task/${idProject}/`, { server: false });
+	const { data: tasks, error } = await useApiFetch(`api/projects-task/${idProject}/`);
 
 	if (!Object.keys(tasks.value).length) {
 		columns.value = columnMaster(status);

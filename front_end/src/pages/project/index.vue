@@ -68,7 +68,7 @@ const auth = useAuthStore();
 const toast = useToast();
 const isOpen = ref(false);
 const loading = ref(false);
-const { data: users } = await useApiFetch('api/users', { server: false });
+const { data: users } = await useApiFetch('api/users');
 const { setPending } = useStore();
 const projects = useState();
 
@@ -128,7 +128,7 @@ const getUserSelect = (users: Object) => {
 async function getProjects() {
 	setPending(true);
 
-	const { data } = useApiFetch('api/projects', { server: false });
+	const { data } = useApiFetch('api/projects');
 	projects.value = data;
 
 	setPending(false);
