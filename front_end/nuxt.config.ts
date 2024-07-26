@@ -27,11 +27,11 @@ export default defineNuxtConfig({
       viewport: 'width=device-width, initial-scale=1',
     },
   },
-  nitro: {
-    devProxy: {
-      '/api': { target: process.env.NITRO_API_URL ?? 'http://localhost:8000/', changeOrigin: true }
-    }
-  },
+  // nitro: {
+  //   devProxy: {
+  //     '/api': { target: process.env.NITRO_API_URL ?? 'http://localhost:8000/', changeOrigin: true }
+  //   }
+  // },
   runtimeConfig: {
     apiSecret: '', // can be overridden by NUXT_API_SECRET environment variable
     public: {
