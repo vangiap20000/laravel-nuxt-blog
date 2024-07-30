@@ -96,7 +96,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 		});
 	} else {
 		await auth.fetchUser();
-		await navigateTo('/');
+		await navigateTo('/task');
 	}
 
 	loading.value = false;
